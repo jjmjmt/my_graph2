@@ -7,13 +7,13 @@ st.set_page_config(page_title="영화 데이터 그래프 도감 2", layout="wid
 st.title("🎬 영화 데이터 그래프 도감 2 - 분포와 관계")
 
 # 2. 데이터 불러오기 및 전처리
-DATA_URL = "https://githubusercontent.com"
+DATA_URL = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
 
 @st.cache_data
 def load_data():
     df = pd.read_csv(DATA_URL)
-    # genre 열에서 세로막대(|) 기호가 있는 경우 첫 번째 장르만 추출
-    df['genre'] = df['genre'].fillna('미분류').astype(str).apply(lambda x: x.split('|')[0])
+    # genre 열에서 세로막대(|) 기호가 있는 경우 첫 번째 장르만 추출 (안전한 문자열 분할 방식)
+    df['genre'] = df['genre'].fillna('미분류').astype(str).apply(lambda x: x.split('|')[0].strip())
     return df
 
 try:
@@ -82,5 +82,4 @@ try:
     st.markdown("---")
 
 except Exception as e:
-    st.error(f"데이터를 불러오는 중 오류가 발생했습니다: {e}")
-
+    st.error(f"데이터를 불러오거나 시각화하는 중 오류가 발생했습니다: {e}")
