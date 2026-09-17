@@ -7,7 +7,7 @@ st.set_page_config(page_title="영화 데이터 그래프 도감 2", layout="wid
 st.title("🎬 영화 데이터 그래프 도감 2 - 분포와 관계")
 
 # 2. 데이터 불러오기 및 전처리
-DATA_URL = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
+DATA_URL = "https://githubusercontent.com"
 
 @st.cache_data
 def load_data():
@@ -81,5 +81,58 @@ try:
     st.write("여기에 두 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
+
+    # ==========================================
+    # 세 번째 그래프: 총 관객수 분포 (히스토그램)
+    # ==========================================
+    st.header("📈 3. 영화별 총 관객수 분포 및 최다 흥행작")
+    
+    # 히스토그램 생성
+    fig3 = px.histogram(
+        df, 
+        x='total_audi',
+        nbins=30, # 구간 수 설정
+        title="영화별 총 관객수 빈도 분포",
+        labels={'total_audi': '총 관객수', 'count': '영화 수'},
+        color_discrete_sequence=['#4A90E2']
+    )
+    
+    # 레이아웃 수정 및 Y축 라벨 표기 고정
+    fig3.update_layout(
+        yaxis_title="영화 수",
+        showlegend=False
+    )
+    
+    # 호버 템플릿 설정
+    fig3.update_traces(
+        hovertemplate="관객수 구간: %{x}<br>영화 수: %{y}편<extra></extra>"
+    )
+    
+    st.plotly_chart(fig3, use_container_width=True)
+    
+    # 데이터 자동 분석 및 변수 추출
+    # 1. 가장 관객수가 많은 영화 찾기
+    max_movie_idx = df['total_audi'].idxmax()
+    max_movie_name = df.loc[max_movie_idx, 'movieNm']
+    max_movie_audi = df.loc[max_movie_idx, 'total_audi']
+    
+    # 2. 밀집 구간 계산 (대부분의 영화가 몰려있는 하위 70% 구간 경계값 확인)
+    threshold_audi = df['total_audi'].quantile(0.7)
+    most_dense_count = df[df['total_audi'] <= threshold_audi].shape[0]
+    
+    # 그래프 설명 구역 및 동적 안내 문구 추가
+    st.markdown("---")
+    st.subheader("💡 이 그래프로 알 수 있는 것")
+    st.write(
+        f"📊 분석 결과, 이 기간에 개봉한 영화 중 대부분({most_dense_count}편)이 "
+        f"**총 관객수 {threshold_audi/10000:.0f}만 명 이하**의 낮은 관객수 구간에 밀집해 있는 전형적인 롱테일 분포를 보입니다."
+    )
+    st.write(
+        f"🏆 한편, 가장 많은 관객을 동원한 최고의 흥행 영화는 "
+        f"**'{max_movie_name}'**이며, 총 **{max_movie_audi:,}명**의 압도적인 스코어를 기록했습니다."
+    )
+    st.markdown("---")
+
 except Exception as e:
     st.error(f"데이터를 불러오거나 시각화하는 중 오류가 발생했습니다: {e}")
+
