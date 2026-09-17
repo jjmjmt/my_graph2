@@ -149,7 +149,8 @@ try:
     
     # 마우스 올렸을 때 서식 정돈 (천 단위 쉼표 포함)
     fig4.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>스크린수: %{x:,}개<br>총 관객수: %{y:,}명<extra></extra>"
+        hovertemplate="<b>%{hovertext}</b><br>장르: %{customdata[0]}<br>스크린수: %{x:,}개<br>총 관객수: %{y:,}명<extra></extra>",
+        customdata=df[['genre']]
     )
     
     st.plotly_chart(fig4, use_container_width=True)
@@ -160,41 +161,5 @@ try:
     st.write("여기에 네 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
-
-    # ==========================================
-    # 다섯 번째 그래프: 주요 장르별 총 관객수 (박스플롯)
-    # ==========================================
-    st.header("📦 5. 주요 장르별 총 관객수 분포 비교")
-    
-    # 영화가 10편 이상인 장르 필터링
-    genre_counts_series = df['genre'].value_counts()
-    major_genres = genre_counts_series[genre_counts_series >= 10].index.tolist()
-    df_filtered = df[df['genre'].isin(major_genres)]
-    
-    # 박스플롯 차트 생성
-    fig5 = px.box(
-        df_filtered,
-        x='genre',
-        y='total_audi',
-        color='genre',  # 장르별 색상 다르게
-        hover_name='movieNm',  # 마우스 올렸을 때 상자 외부 점(이상치)에 영화명 노출
-        title="영화 10편 이상 장르의 관객수 분포 (이상치 점 마우스 오버 시 영화명 확인)",
-        labels={'genre': '장르', 'total_audi': '총 관객수 (명)'}
-    )
-    
-    # 호버 템플릿 설정 (이상치 및 데이터 포인트 정보 포맷팅)
-    fig5.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{y:,}명<extra></extra>"
-    )
-    
-    st.plotly_chart(fig5, use_container_width=True)
-    
-    # 그래프 설명 구역
-    st.markdown("---")
-    st.subheader("💡 이 그래프로 알 수 있는 것")
-    st.write("여기에 다섯 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
-    st.markdown("---")
-
 except Exception as e:
     st.error(f"데이터를 불러오거나 시각화하는 중 오류가 발생했습니다: {e}")
-
