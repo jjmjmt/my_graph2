@@ -54,3 +54,31 @@ try:
 
 except Exception as e:
     st.error(f"데이터를 불러오는 중 오류가 발생했습니다: {e}")
+
+    # ==========================================
+    # 두 번째 그래프: 장르 내 영화 총 관객수 (트리맵)
+    # ==========================================
+    st.header("🧱 2. 장르별 영화 총 관객수 규모")
+    
+    # 트리맵 차트 생성 (장르 -> 영화명 계층 구조)
+    fig2 = px.treemap(
+        df,
+        path=[px.Constant("전체 영화"), 'genre', 'movieNm'],
+        values='total_audi',
+        title="장르 및 영화별 총 관객수 분포 (칸 크기: 총 관객수)",
+        labels={'total_audi': '총 관객수', 'genre': '장르', 'movieNm': '영화명'}
+    )
+    
+    # 호버(마우스 올림) 설정 및 텍스트 서식 (관객수 숫자 포맷팅)
+    fig2.update_traces(
+        hovertemplate="<b>%{label}</b><br>총 관객수: %{value:,}명<extra></extra>"
+    )
+    
+    st.plotly_chart(fig2, use_container_width=True)
+    
+    # 그래프 설명 구역
+    st.markdown("---")
+    st.subheader("💡 이 그래프로 알 수 있는 것")
+    st.write("여기에 두 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
+    st.markdown("---")
+
