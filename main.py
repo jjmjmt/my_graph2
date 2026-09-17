@@ -7,27 +7,29 @@ st.set_page_config(page_title="영화 데이터 그래프 도감 2", layout="wid
 st.title("🎬 영화 데이터 그래프 도감 2 - 분포와 관계")
 
 # 2. 데이터 불러오기 및 전처리
-DATA_URL = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
+DATA_URL = "https://githubusercontent.com"
 
 @st.cache_data
 def load_data():
     df = pd.read_csv(DATA_URL)
     # genre 열에서 세로막대(|) 기호가 있는 경우 첫 번째 장르만 추출
-    df['genre'] = df['genre'].fillna('미분류').astype(str).str.split('|').str[0]
+    df['genre'] = df['genre'].fillna('미분류').astype(str).apply(lambda x: x.split('|')[0])
     return df
 
 try:
     df = load_data()
 
-    # 3. 첫 번째 그래프: 장르별 영화 편수 (도넛 그래프)
-    st.header("📊 장르별 영화 편수 분포")
+    # ==========================================
+    # 첫 번째 그래프: 장르별 영화 편수 (도넛 그래프)
+    # ==========================================
+    st.header("📊 1. 장르별 영화 편수 분포")
     
     # 장르별 데이터 집계
     genre_counts = df['genre'].value_counts().reset_index()
     genre_counts.columns = ['장르', '영화 편수']
     
     # 파이/도넛 차트 생성
-    fig = px.pie(
+    fig1 = px.pie(
         genre_counts, 
         values='영화 편수', 
         names='장르', 
@@ -37,23 +39,20 @@ try:
     )
     
     # 호버(마우스 올림) 시 편수와 비율이 보이도록 설정
-    fig.update_traces(
+    fig1.update_traces(
         textposition='inside', 
         textinfo='percent+label',
         hovertemplate="<b>%{label}</b><br>편수: %{value}편<br>비율: %{percent}<extra></extra>"
     )
     
-    # 스트림릿에 그래프 출력
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig1, use_container_width=True)
     
-    # 그래프 설명 구역 (구분선 추가)
+    # 그래프 설명 구역
     st.markdown("---")
     st.subheader("💡 이 그래프로 알 수 있는 것")
-    st.write(" 여기에 이 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
+    st.write("여기에 첫 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
-except Exception as e:
-    st.error(f"데이터를 불러오는 중 오류가 발생했습니다: {e}")
 
     # ==========================================
     # 두 번째 그래프: 장르 내 영화 총 관객수 (트리맵)
@@ -82,3 +81,5 @@ except Exception as e:
     st.write("여기에 두 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
+except Exception as e:
+    st.error(f"데이터를 불러오는 중 오류가 발생했습니다: {e}")
