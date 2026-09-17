@@ -12,7 +12,7 @@ DATA_URL = "https://githubusercontent.com"
 @st.cache_data
 def load_data():
     df = pd.read_csv(DATA_URL)
-    # genre 열에서 세로막대(|) 기호가 있는 경우 첫 번째 장르만 추출 (안전한 문자열 분할 방식)
+    # genre 열에서 세로막대(|) 기호가 있는 경우 첫 번째 장르만 추출 후 공백 제거
     df['genre'] = df['genre'].fillna('미분류').astype(str).apply(lambda x: x.split('|')[0].strip())
     return df
 
@@ -111,12 +111,9 @@ try:
     st.plotly_chart(fig3, use_container_width=True)
     
     # 데이터 자동 분석 및 변수 추출
-    # 1. 가장 관객수가 많은 영화 찾기
     max_movie_idx = df['total_audi'].idxmax()
     max_movie_name = df.loc[max_movie_idx, 'movieNm']
     max_movie_audi = df.loc[max_movie_idx, 'total_audi']
-    
-    # 2. 밀집 구간 계산 (대부분의 영화가 몰려있는 하위 70% 구간 경계값 확인)
     threshold_audi = df['total_audi'].quantile(0.7)
     most_dense_count = df[df['total_audi'] <= threshold_audi].shape[0]
     
@@ -131,6 +128,71 @@ try:
         f"🏆 한편, 가장 많은 관객을 동원한 최고의 흥행 영화는 "
         f"**'{max_movie_name}'**이며, 총 **{max_movie_audi:,}명**의 압도적인 스코어를 기록했습니다."
     )
+    st.markdown("---")
+
+
+    # ==========================================
+    # 네 번째 그래프: 개봉일 스크린수 vs 총 관객수 (산점도)
+    # ==========================================
+    st.header("🎯 4. 개봉일 스크린수와 총 관객수의 상관관계")
+    
+    # 산점도 차트 생성
+    fig4 = px.scatter(
+        df,
+        x='first_scrn',
+        y='total_audi',
+        color='genre',  # 장르별 점 색상 다르게 설정
+        hover_name='movieNm',  # 호버 시 가장 위에 영화명 노출
+        title="개봉일 스크린수 대비 총 관객수 분포 (색상: 장르)",
+        labels={'first_scrn': '개봉일 스크린수 (개)', 'total_audi': '총 관객수 (명)', 'genre': '장르'}
+    )
+    
+    # 마우스 올렸을 때 서식 정돈 (천 단위 쉼표 포함)
+    fig4.update_traces(
+        hovertemplate="<b>%{hovertext}</b><br>스크린수: %{x:,}개<br>총 관객수: %{y:,}명<extra></extra>"
+    )
+    
+    st.plotly_chart(fig4, use_container_width=True)
+    
+    # 그래프 설명 구역
+    st.markdown("---")
+    st.subheader("💡 이 그래프로 알 수 있는 것")
+    st.write("여기에 네 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
+    st.markdown("---")
+
+
+    # ==========================================
+    # 다섯 번째 그래프: 주요 장르별 총 관객수 (박스플롯)
+    # ==========================================
+    st.header("📦 5. 주요 장르별 총 관객수 분포 비교")
+    
+    # 영화가 10편 이상인 장르 필터링
+    genre_counts_series = df['genre'].value_counts()
+    major_genres = genre_counts_series[genre_counts_series >= 10].index.tolist()
+    df_filtered = df[df['genre'].isin(major_genres)]
+    
+    # 박스플롯 차트 생성
+    fig5 = px.box(
+        df_filtered,
+        x='genre',
+        y='total_audi',
+        color='genre',  # 장르별 색상 다르게
+        hover_name='movieNm',  # 마우스 올렸을 때 상자 외부 점(이상치)에 영화명 노출
+        title="영화 10편 이상 장르의 관객수 분포 (이상치 점 마우스 오버 시 영화명 확인)",
+        labels={'genre': '장르', 'total_audi': '총 관객수 (명)'}
+    )
+    
+    # 호버 템플릿 설정 (이상치 및 데이터 포인트 정보 포맷팅)
+    fig5.update_traces(
+        hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{y:,}명<extra></extra>"
+    )
+    
+    st.plotly_chart(fig5, use_container_width=True)
+    
+    # 그래프 설명 구역
+    st.markdown("---")
+    st.subheader("💡 이 그래프로 알 수 있는 것")
+    st.write("여기에 다섯 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
 except Exception as e:
