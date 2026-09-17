@@ -161,5 +161,3 @@ try:
     st.write("여기에 네 번째 그래프를 통해 분석할 수 있는 인사이트 한 문장을 입력하세요.")
     st.markdown("---")
 
-except Exception as e:
-    st.error(f"데이터를 불러오거나 시각화하는 중 오류가 발생했습니다: {e}")
