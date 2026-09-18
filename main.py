@@ -224,8 +224,35 @@ st.info(
 )
 st.markdown("---")
 
-좋아, 여기서 이어서 고쳐 줘. 여덟 번째 그래프를 추가해.
-- 내 질문: 10위권에 오래 머문 영화는 총 관객도 많은가
-- 이 질문에는 산점도가 어울릴 것 같아. 가로축은 days_in_top10(10위권에 머문 날수), 세로축은 total_audi(총 관객)로.
-- 그래프 제목은 내 질문을 그대로 적어 줘.
-- 점에 마우스를 올리면 영화명이 보이게.
+# -------------------------------------------------------------------
+# 여덟 번째 그래프: 10위권 체류 기간 vs 총 관객수 (산점도)
+# -------------------------------------------------------------------
+st.subheader("8. 10위권 체류 기간과 총 관객수의 관계")
+
+# 8번째 그래프 생성 (영화명 컬럼: movieNm)
+fig8 = px.scatter(
+    df,
+    x="days_in_top10",
+    y="total_audi",
+    hover_name="movieNm",  # 'movie_name' -> 'movieNm' 으로 수정
+    color="genre",
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    labels={"days_in_top10": "10위권 머문 날수", "total_audi": "총 관객수", "genre": "장르"},
+)
+
+# 호버 서식 지정 및 스타일 수정
+fig8.update_traces(
+    marker=dict(size=10, opacity=0.7),
+    hovertemplate="<b>%{hovertext}</b><br>10위권 머문 날수: %{x}일<br>총 관객수: %{y:,}명<extra></extra>",
+)
+
+# Streamlit에 출력 (fig8.show() 대신 st.plotly_chart 사용)
+st.plotly_chart(fig8, use_container_width=True)
+
+st.markdown("---")
+st.markdown("💡 **이 그래프로 알 수 있는 것**")
+st.info(
+    "박스오피스 Top 10 진입 일수가 긴 영화일수록 누적 관객 수도 큰 비례 관계를 나타내는지, "
+    "혹은 단기간 흥행 후 가파르게 누적 관객을 끌어 모은 영화가 존재하는지 분석할 수 있습니다."
+)
+st.markdown("---")
